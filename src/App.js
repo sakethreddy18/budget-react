@@ -5,6 +5,7 @@ import DisplayBalances from "./components/DisplayBalances";
 import { useEffect, useState } from "react";
 import EntryLines from "./components/EntryLines";
 import ModalEdit from "./components/ModalEdit";
+import { createStore } from "redux";
 
 
 function App() {
@@ -93,6 +94,53 @@ function App() {
     setTotal(totalIncome - totalExpenses)
     console.log(`totalIncome : ${totalIncome} totalExpense : ${totalExpenses}`)
   }, entries)
+
+/// Redux Store 
+  const store = createStore((state = initialEntries , action) => {
+
+    switch (action.type) {
+      case 'ADD_ENTRY':
+        return state.concat({...action.payload})
+      
+      case 'REMOVE_ENTRY':
+        return state.filter(entry => entry.id !== action.payload.id)
+
+      default:
+        return state
+    }
+
+
+    return state
+  })
+  
+  store.subscribe(() => {
+    console.log(`store.getState()`, store.getState())
+  })
+  
+  const paylod_add = {
+    id: 8,
+    description: "New Transaction",
+    value: "100.00",
+    isExpense: false
+  }
+
+
+  function addEntryRedux(payload) {
+    return {type: 'ADD_ENTRY', payload}
+
+  }
+
+  function removeEntryRedux(id) { 
+    return {type: 'REMOVE_ENTRY', payload : {id}}
+  }
+
+  store.dispatch(addEntryRedux(paylod_add))
+  store.dispatch(removeEntryRedux(8))
+ 
+
+  
+  
+///
 
   function deleteEntry(id) {
     const result = entries.filter(entry => entry.id !== id)
